@@ -1,0 +1,7 @@
+.form-container {
+    width: min(95%, 400px);
+}
+
+.form label {
+    width: 100%;
+}
