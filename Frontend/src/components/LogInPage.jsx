@@ -33,6 +33,12 @@ function LogInPage({ setIsLogIn }) {
     }
 
     const [showPassword, setShowPassword] = useState(false)
+    useEffect(()=>{
+        localStorage.getItem('logedIn');
+        if(localStorage.getItem('logedIn') === 'true'){
+            setIsLogIn(true)
+        }
+    },[])
     return (
         <>
             <div className='log-in-page form-container'>

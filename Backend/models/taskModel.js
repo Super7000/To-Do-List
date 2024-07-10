@@ -10,7 +10,6 @@ const getAllTasks = async (userId) => {
 const createTask = async (userId, title, description, dueDate) => {
     const connection = await pool.getConnection();
     const [result] = await connection.query('INSERT INTO tasks (user_id, title, description, due_date) VALUES (?, ?, ?, ?)', [userId, title, description, dueDate]); 
-    console.log(result)
     connection.release()
     return result.insertId; 
 }; 

@@ -1,7 +1,7 @@
 import React from 'react';
 import ProfileSection from './ProfileSection';
 
-function SideBar({ closeSideBar, setIsLogIn }) {
+function SideBar({ closeSideBar, logOutFunction = () => { } }) {
     return (
         <div className='left-side-bar p-3 col d-flex flex-column' style={{ backgroundColor: 'rgba(0,0,0,0.04)' }}>
             <div className='input-group d-flex align-items-center'>
@@ -16,7 +16,7 @@ function SideBar({ closeSideBar, setIsLogIn }) {
             <Groups />
             <Lists />
             <ProfileSection />
-            <button className='btn btn-primary mt-3' style={{ whiteSpace: 'nowrap' }} title='Log Out' onClick={() => setIsLogIn(false)}>
+            <button className='btn btn-primary mt-3' style={{ whiteSpace: 'nowrap' }} title='Log Out' onClick={logOutFunction}>
                 <img src='log-out.svg' className='me-2' width={15} height={15} style={{ transform: 'rotate(-90deg)' }}></img>Log Out
             </button>
         </div>

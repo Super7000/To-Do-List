@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import SideBar from './SideBar';
-import { getTasks } from '../scripts/apiCalls';
+import { addTask, deleteTask, getTasks } from '../scripts/apiCalls';
+import { convert12hrTo24hr } from '../scripts/utils';
 
 function ToDosPage({ setIsLogIn }) {
     const [showSideBar, setShowSideBar] = useState(true)
@@ -9,64 +10,33 @@ function ToDosPage({ setIsLogIn }) {
         setShowSideBar(false)
     }
 
+    function logOutFunction(){
+        setIsLogIn(false);
+        localStorage.clear();
+    }
+
     return (
         <div className='h-100' style={{ transition: '0.3s', display: 'grid', gridTemplateColumns: (showSideBar ? ('min(35%,400px) auto') : '100%') }}>
-            {showSideBar && <SideBar closeSideBar={closeSideBar} setIsLogIn={setIsLogIn} />}
-            <Tasks />
+            {showSideBar && <SideBar closeSideBar={closeSideBar} logOutFunction={logOutFunction} />}
+            <Tasks logOutFunction={logOutFunction} />
         </div>
     );
 }
 
-function Tasks() {
-    const [tasks, setTasks] = useState([
-        {
-            task_id: 1,
-            user_id: 1,
-            category_id: 1,
-            title: 'Task 1',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-            due_date: '2024-06-24',
-            completed: false,
-            created_at: '2024-06-24 00:00:00',
-            updated_at: '2024-06-24 00:00:00',
-        },
-        {
-            task_id: 2,
-            user_id: 1,
-            category_id: 1,
-            title: 'Task 2',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-            due_date: '2024-06-25',
-            completed: false,
-            created_at: '2024-06-25 00:00:00',
-            updated_at: '2024-06-25 00:00:00',
-        },
-        {
-            task_id: 3,
-            user_id: 1,
-            category_id: 1,
-            title: 'Task 3',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-            due_date: '2024-06-26',
-            completed: false,
-            created_at: '2024-06-26 00:00:00',
-            updated_at: '2024-06-26 00:00:00',
-        },
-        {
-            task_id: 4,
-            user_id: 1,
-            category_id: 1,
-            title: 'Task 4',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-            due_date: '2024-06-27',
-            completed: false,
-            created_at: '2024-06-27 00:00:00',
-            updated_at: '2024-06-27 00:00:00',
-        },
-    ])
+function Tasks({ logOutFunction = () => { } }) {
+    const [tasks, setTasks] = useState([])
+
+    const downloadAllTasks = async () => {
+        const tasksArray = await getTasks(logOutFunction)
+        if (await tasksArray) {
+            setTasks(tasksArray)
+        } else {
+            setTasks([])
+        }
+    }
 
     useEffect(() => {
-        console.log(getTasks())
+        downloadAllTasks()
     }, [])
 
     function completedBtnChangeHandler(e, task_id) {
@@ -90,6 +60,30 @@ function Tasks() {
             setTasks(newTasks)
         }
     }
+
+    function getCurrentTime() {
+        const now = new Date();
+
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+
+        // Ensure two digits for hours
+        hours = hours < 10 ? `0${hours}` : hours;
+
+        const time = `${hours}:${minutes}`;
+
+        return time;
+    }
+
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    const [dueDate, setDueDate] = useState(formatDate(new Date()))
+    const [dueTime, setDueTime] = useState(getCurrentTime())
     return (
         <div className='col p-3 d-flex flex-column' style={{ gap: '0.5rem', overflowY: 'scroll', maxHeight: '100vh' }}>
             <div className='d-flex justify-content-between'>
@@ -103,25 +97,53 @@ function Tasks() {
                     </button>
                 </div>
             </div>
-            <div className='d-flex flex-column' style={{ gap: '0.5rem', overflowY: 'scroll', maxHeight: '100vh' }}>
-                {tasks.length <= 0 ? "No Task Added" : tasks.map(task => <Task key={task.task_id} {...task} completedBtnChangeHandler={completedBtnChangeHandler} />)}
+
+            <div className='d-flex flex-column flex-grow-1' style={{ gap: '0.5rem', overflowY: 'scroll', maxHeight: '100vh' }}>
+                {
+                    tasks.length <= 0 ?
+                        <div className='m-auto'>No Task Added</div> :
+                        tasks.map(task => <Task key={task.task_id} {...task} completedBtnChangeHandler={completedBtnChangeHandler} downloadAllTasks={downloadAllTasks} />)
+                }
             </div>
-            <button className='rounded ms-auto mt-auto p-3 border-0' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }} onClick={async () => {
-                let newTasks = [...tasks]
-                let id = tasks[tasks.length - 1].task_id + 1;
-                newTasks.push({
-                    task_id: id,
-                    user_id: 1,
-                    category_id: 1,
-                    title: 'Task ' + id,
-                    description: '',
-                    due_date: '2024-06-27',
-                    completed: false,
-                    created_at: new Date(),
-                    updated_at: '2024-06-27 00:00:00',
-                })
-                setTasks(newTasks)
-            }}>
+
+
+            <div className="modal" id={'addTaskPopup'}>
+                <div className="modal-dialog w-100">
+                    <div className="modal-content">
+
+                        <div className="modal-header border-0">
+                            <h4 className="modal-title">New Task</h4>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div className="modal-body">
+                            <form className='form card-body d-flex flex-column px-5'>
+                                <div>
+                                    <label className='form-label'>
+                                        Due Date:
+                                        <input type="date" name="email" value={dueDate} placeholder='Select a Date' onChange={e => setDueDate(e.target.value)} className='form-control' />
+                                    </label>
+                                </div>
+                                <div>
+                                    <label className='form-label'>
+                                        Due Time:
+                                        <input type="time" name="time" value={dueTime} placeholder='Select a Time' onChange={e => setDueTime(e.target.value)} className='form-control' />
+                                    </label>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div className="modal-footer border-0">
+                            <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={async () => {
+                                addTask('Task', 'Description', dueDate + ' ' + dueTime, downloadAllTasks)
+                            }}>Save</button>
+                            <button type="button" className="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <button className='rounded ms-auto mt-auto p-3 border-0' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }} data-bs-toggle="modal" data-bs-target={"#addTaskPopup"}>
                 <div className='btn-close' style={{ transform: 'rotate(45deg)' }}></div>
             </button>
         </div>
@@ -134,16 +156,15 @@ function Task({
     category_id = 1,
     title = 'Task',
     description = '',
-    due_date = '2024-06-27',
+    due_date = '2024-07-12 21:44:03',
     completed = false,
     created_at = new Date(),
     updated_at = '2024-06-27 00:00:00',
-    completedBtnChangeHandler = (e, task_id) => { }
+    completedBtnChangeHandler = (e, task_id) => { },
+    downloadAllTasks = () => { },
 }) {
-    const [dueDate, setDueDate] = useState('2003-12-12')
-    function inputHandler(e) {
-        setDueDate(e.target.value)
-    }
+    const [dueDate, setDueDate] = useState(due_date.split('T')[0])
+    const [dueTime, setDueTime] = useState(due_date.split('T')[1].split('.')[0].split(':').slice(0, 2).join(':'))
     return (
         <>
             <form className={'card' + (completed ? " border border-2 border-success" : "")} onDoubleClick={e => {
@@ -157,9 +178,16 @@ function Task({
                             </label>
                         </div>
                         <input className='text-dark fw-bold border-0 form-control' style={{ textDecoration: (completed ? "line-through" : "none") }} placeholder='Task' defaultValue={title}></input>
-                        <div className='btn btn-transparant border-0' data-bs-toggle="modal" data-bs-target={"#popup" + task_id}>
-                            <img src='edit.svg'></img>
+                        <div className='text-secondary ms-auto d-flex flex-column align-items-center' data-bs-toggle="modal" data-bs-target={"#popup" + task_id}>
+                            <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (completed ? "line-through" : "none") }} >{dueDate}</p>
+                            <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (completed ? "line-through" : "none") }} >{dueTime}</p>
                         </div>
+                        <button className='btn ms-2' onClick={e => {
+                            e.preventDefault();
+                            deleteTask(task_id, downloadAllTasks);
+                        }}>
+                            <img src='delete.svg' width={18} height={18}></img>
+                        </button>
                         <div className='btn btn-transparant dropdown-toggle border-0' data-bs-toggle="collapse" data-bs-target={"#" + task_id}></div>
                     </div>
                     <textarea id={task_id} className="collapse form-control mt-1" rows={3} style={{ resize: 'none' }} defaultValue={description}></textarea>
@@ -179,7 +207,13 @@ function Task({
                                 <div>
                                     <label className='form-label'>
                                         Due Date:
-                                        <input type="date" name="email" value={dueDate} placeholder='Select a Date' onChange={inputHandler} className='form-control' />
+                                        <input type="date" name="email" value={dueDate} placeholder='Select a Date' onChange={e => setDueDate(e.target.value)} className='form-control' />
+                                    </label>
+                                </div>
+                                <div>
+                                    <label className='form-label'>
+                                        Due Time:
+                                        <input type="time" name="time" value={dueTime} placeholder='Select a time' onChange={e => setDueTime(e.target.value)} className='form-control' />
                                     </label>
                                 </div>
                             </form>
