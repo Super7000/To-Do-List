@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getUser } from '../scripts/apiCalls';
 
-const ProfileSection = () => {
+const ProfileSection = ({ logOutFunction = () => { } }) => {
     const [firstName, setFirstName] = useState('User')
     const [lastName, setLastName] = useState('Name')
     const [email, setEmail] = useState('example@email.com')
@@ -25,14 +26,23 @@ const ProfileSection = () => {
         }
     }
     const [showPassword, setShowPassword] = useState(false)
+    useEffect(() => {
+        const downloadUserData = async () => {
+            const userData = await getUser(logOutFunction)
+            setEmail(userData.Email)
+            setFirstName(userData.Username.split(' ')[0])
+            setLastName(userData.Username.split(' ')[1])
+        }
+        downloadUserData()
+    }, [])
     return (
         <div>
             <div className='card w-100' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }} data-bs-toggle="modal" data-bs-target={"#profileDetails"}>
-                <div className='card-body d-flex justify-content-start align-items-center p-2'>
+                <div className='card-body d-flex justify-content-start align-items-center p-2' style={{ overflowY: 'scroll' }}>
                     <div className='rounded-circle bg-success p-3 text-light d-flex align-items-center justify-content-center' style={{ width: '50px', height: '50px' }}>S</div>
                     <div className='ms-2' style={{ lineHeight: '1.2' }}>
                         <div className='fw-bold fs-6'>{firstName} {lastName}</div>
-                        <div className='text-muted'>{email}</div>
+                        <div className='text-muted' style={{ fontSize: '0.7rem' }}>{email}</div>
                     </div>
                 </div>
             </div>

@@ -33,12 +33,12 @@ function LogInPage({ setIsLogIn }) {
     }
 
     const [showPassword, setShowPassword] = useState(false)
-    useEffect(()=>{
+    useEffect(() => {
         localStorage.getItem('logedIn');
-        if(localStorage.getItem('logedIn') === 'true'){
+        if (localStorage.getItem('logedIn') === 'true') {
             setIsLogIn(true)
         }
-    },[])
+    }, [])
     return (
         <>
             <div className='log-in-page form-container'>
@@ -60,7 +60,19 @@ function LogInPage({ setIsLogIn }) {
                                 <label className='form-label'>
                                     Password:
                                     <div className='input-group'>
-                                        <input type={showPassword ? "text" : "password"} name="password" value={password} placeholder='Enter Password' onChange={inputHandler} className='form-control border-end-0 rounded-start' />
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            name="password" value={password}
+                                            placeholder='Enter Password'
+                                            onChange={inputHandler}
+                                            className='form-control border-end-0 rounded-start'
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter' || e.keyCode === 13) {
+                                                    e.preventDefault()
+                                                    login(email, password, () => setIsLogIn(true))
+                                                }
+                                            }}
+                                        />
                                         <button className='btn btn-transparant border border-start-0' onClick={e => {
                                             e.preventDefault()
                                             setShowPassword(val => !val)
@@ -72,7 +84,7 @@ function LogInPage({ setIsLogIn }) {
                             </div>
                             <button className='btn btn-primary' type="submit" onClick={e => {
                                 e.preventDefault()
-                                login(email, password, ()=>setIsLogIn(true))
+                                login(email, password, () => setIsLogIn(true))
                             }}>Log In</button>
                             <div>Don't have an account? <span className='text-primary' onClick={() => setIsSignInState(true)}>Create a new account</span></div>
                         </>}

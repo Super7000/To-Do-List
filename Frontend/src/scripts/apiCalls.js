@@ -130,4 +130,61 @@ const deleteTask = async (taskId, successfullFuncCallBack = () => { }) => {
     }
 };
 
+// Function to update a task
+const updateTask = async (taskId, title, description, dueDate, completed, successfullFuncCallBack = () => { }, showAlert = true) => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`${apiUrl}/api/tasks/${taskId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': `${token}`,
+            },
+            body: JSON.stringify({ title, description, dueDate, completed }),
+        });
+
+        if (response.ok) {
+            showAlert ? alert('Task updated successfully') : "";
+            successfullFuncCallBack()
+        } else {
+            const data = await response.json();
+            alert(data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+// Function to get user information
+const getUser = async (onErrFunc = () => { }) => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`${apiUrl}/api/user`, {
+            headers: {
+                'authorization': `${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                // Handle unauthorized error (e.g., redirect to login page)
+                console.log('Unauthorized access');
+                // Example: redirect to login page
+                onErrFunc();
+            } else {
+                // Handle other HTTP errors
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+export { getUser };
+
+export { updateTask };
+
 export { deleteTask };

@@ -15,7 +15,7 @@ function SideBar({ closeSideBar, logOutFunction = () => { } }) {
             </div>
             <Groups />
             <Lists />
-            <ProfileSection />
+            <ProfileSection logOutFunction={logOutFunction} />
             <button className='btn btn-primary mt-3' style={{ whiteSpace: 'nowrap' }} title='Log Out' onClick={logOutFunction}>
                 <img src='log-out.svg' className='me-2' width={15} height={15} style={{ transform: 'rotate(-90deg)' }}></img>Log Out
             </button>

@@ -14,4 +14,11 @@ const createUser = async (username, email, hashedPassword) => {
     return result.insertId;
 };
 
-module.exports = { getUserByEmail, createUser }; 
+const getUserById = async (userId) => {
+    const connection = await pool.getConnection();
+    const [rows] = await connection.query('SELECT ID, Username, Email, Created_At FROM User_Details WHERE ID = ?', [userId]);
+    connection.release();
+    return rows[0];
+};
+
+module.exports = { getUserByEmail, createUser, getUserById }; 
