@@ -4,7 +4,7 @@ It is a Full Stack To Do List Web Application created using ReactJS, CSS, HTML i
 
 # To use this app follow the below steps:
 
-**Step 1:** First of all fork this repositoy and run `npm install` command which will install all dependencies and librarys.
+**Step 1:** First of all fork this repositoy and run `npm install` command in both Frontend and Backend directory which will install all dependencies and librarys.
 
 **Step 2:** Then go to Frontend Directory then build the react app using `npm run build`.
 
