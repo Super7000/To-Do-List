@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import SideBar from './SideBar';
-import { addTask, deleteTask, getTasks, updateTask } from '../scripts/apiCalls';
+import { addTask, deleteTask, getTasksByCategoryId, updateTask } from '../scripts/API Calls/tasksApiCalls';
+import { deleteCategory, getCategories } from '../scripts/API Calls/categoryApiCalls';
 
 function ToDosPage({ setIsLogIn }) {
     const [showSideBar, setShowSideBar] = useState(true)
+    const [activeCategory, setActiveCategory] = useState('')
 
     function closeSideBar() {
         setShowSideBar(false)
@@ -16,17 +18,17 @@ function ToDosPage({ setIsLogIn }) {
 
     return (
         <div className='h-100' style={{ transition: '0.3s', display: 'grid', gridTemplateColumns: (showSideBar ? ('min(35%,400px) auto') : '100%') }}>
-            {showSideBar && <SideBar closeSideBar={closeSideBar} logOutFunction={logOutFunction} />}
-            <Tasks logOutFunction={logOutFunction} />
+            {showSideBar && <SideBar closeSideBar={closeSideBar} logOutFunction={logOutFunction} activeCategory={activeCategory} setActiveCategory={setActiveCategory} />}
+            {activeCategory.length <= 0 ? <div className='m-auto'>Create a category first</div> : <Tasks logOutFunction={logOutFunction} activeCategory={activeCategory} setActiveCategory={setActiveCategory} />}
         </div>
     );
 }
 
-function Tasks({ logOutFunction = () => { } }) {
+function Tasks({ logOutFunction = () => { }, activeCategory, setActiveCategory }) {
     const [tasks, setTasks] = useState([])
 
     const downloadAllTasks = async () => {
-        const tasksArray = await getTasks(logOutFunction)
+        const tasksArray = await getTasksByCategoryId(activeCategory.category_id, logOutFunction)
         if (await tasksArray) {
             setTasks(tasksArray)
         } else {
@@ -36,23 +38,29 @@ function Tasks({ logOutFunction = () => { } }) {
 
     useEffect(() => {
         downloadAllTasks()
-    }, [])
+    }, [activeCategory])
 
     return (
         <div className='col p-3 d-flex flex-column' style={{ gap: '0.5rem', overflowY: 'scroll', maxHeight: '100vh' }}>
             <div className='d-flex justify-content-between'>
                 <div>
-                    <div className='fw-bold fs-3'>List</div>
-                    <div className='fs-6 text-secondary'>24th-june-2024</div>
+                    <div className='fw-bold fs-3' style={{ lineHeight: 1.2 }}>{activeCategory.name} <p className='text-muted m-0' style={{ fontSize: '0.8rem' }}>ID: {activeCategory.category_id}</p></div>
+                    <div className='fs-6 text-secondary mt-1'>{activeCategory.created_at}</div>
                 </div>
                 <div className='d-flex align-items-center'>
-                    <button className='btn btn-secondary px-2 py-0 pb-2 border-0' style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                    <button className='btn btn-secondary px-2 py-0 pb-2 border-0' style={{ backgroundColor: 'rgba(0,0,0,0.2)' }} onClick={async () => {
+                        deleteCategory(activeCategory.category_id, async () => {
+                            getCategories().then((data) => {
+                                setActiveCategory(data[0])
+                            })
+                        })
+                    }}>
                         <img src='delete.svg' width={18} height={18}></img>
                     </button>
                 </div>
             </div>
 
-            <div className='d-flex flex-column flex-grow-1' style={{ gap: '0.5rem', overflowY: 'scroll', maxHeight: '100vh' }}>
+            <div className='d-flex flex-column flex-grow-1 scroll' style={{ gap: '0.5rem', maxHeight: '100vh' }}>
                 {
                     tasks.length <= 0 ?
                         <div className='m-auto'>No Task Added</div> :
@@ -63,7 +71,7 @@ function Tasks({ logOutFunction = () => { } }) {
                 heading='Add Task'
                 id={"addTaskPopup"}
                 saveBtnClickHandler={async (dueDate, dueTime) => {
-                    addTask('Task', 'Description', dueDate + ' ' + dueTime, downloadAllTasks)
+                    addTask(activeCategory.category_id, 'Task', 'Description', dueDate + ' ' + dueTime, downloadAllTasks)
                 }}
             />
             <button className='rounded ms-auto mt-auto p-3 border-0' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }} data-bs-toggle="modal" data-bs-target={"#addTaskPopup"}>
@@ -88,6 +96,7 @@ function Task({
     const [titleState, setTitleState] = useState(title)
     const [descriptionState, setDescriptionState] = useState(description)
     const [completedState, setCompletedState] = useState(completed)
+
     function onChangeHandler(e) {
         switch (e.target.name) {
             case 'title':
@@ -129,7 +138,7 @@ function Task({
                     <div className='input-group d-flex align-items-center'>
                         <div className="form-check d-flex align-items-center">
                             <label className="form-check-label">
-                                <input className="form-check-input border-2 rounded-pill p-2" type="checkbox" name="completed" checked={completedState} onChange={e => completedBtnChangeHandler(e)} />
+                                <input className="form-check-input border-2 rounded-pill p-2 cursor-pointer" type="checkbox" name="completed" checked={completedState} onChange={e => completedBtnChangeHandler(e)} />
                             </label>
                         </div>
                         <input
@@ -146,7 +155,7 @@ function Task({
                                 }
                             }}
                         />
-                        <div className='text-secondary ms-auto d-flex flex-column align-items-center' data-bs-toggle="modal" data-bs-target={"#popup" + task_id}>
+                        <div className='text-secondary ms-auto d-flex flex-column align-items-center cursor-pointer' data-bs-toggle="modal" data-bs-target={"#popup" + task_id}>
                             <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (completed ? "line-through" : "none") }} >{due_date.split(' ')[0]}</p>
                             <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (completed ? "line-through" : "none") }} >{due_date.split(' ')[1]}</p>
                         </div>
@@ -183,7 +192,7 @@ function Task({
     )
 }
 
-function PopUp({ heading, saveBtnClickHandler = (a, b) => { }, id, onChangeClickHanlder = () => { }, defaultDueDate, defaultDueTime }) {
+function PopUp({ heading, saveBtnClickHandler = (a, b) => { }, id, onChangeClickHanlder = (e) => { }, defaultDueDate, defaultDueTime }) {
     function getCurrentTime() {
         const now = new Date();
 
@@ -219,6 +228,7 @@ function PopUp({ heading, saveBtnClickHandler = (a, b) => { }, id, onChangeClick
             default:
                 break;
         }
+        onChangeClickHanlder(e)
     }
     return (
         <div className="modal" id={id}>
@@ -231,17 +241,17 @@ function PopUp({ heading, saveBtnClickHandler = (a, b) => { }, id, onChangeClick
                     </div>
 
                     <div className="modal-body">
-                        <form className='form card-body d-flex flex-column px-5'>
+                        <form className='form card-body d-flex flex-column px-5' style={{ gap: '0.5rem' }}>
                             <div>
                                 <label className='form-label'>
                                     Due Date:
-                                    <input type="date" name="date" value={dueDate} placeholder='Select a Date' onChange={onChangeClickHanlderInner} className='form-control' />
+                                    <input type="date" name="date" value={dueDate} placeholder='Select a Date' onChange={onChangeClickHanlderInner} className='form-control mt-2' />
                                 </label>
                             </div>
                             <div>
                                 <label className='form-label'>
                                     Due Time:
-                                    <input type="time" name="time" value={dueTime} placeholder='Select a time' onChange={onChangeClickHanlderInner} className='form-control' />
+                                    <input type="time" name="time" value={dueTime} placeholder='Select a time' onChange={onChangeClickHanlderInner} className='form-control mt-2' />
                                 </label>
                             </div>
                         </form>

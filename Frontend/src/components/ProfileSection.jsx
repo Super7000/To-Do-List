@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getUser } from '../scripts/apiCalls';
+import { getUser } from '../scripts/API Calls/userApiCalls';
 
 const ProfileSection = ({ logOutFunction = () => { } }) => {
     const [firstName, setFirstName] = useState('User')
@@ -29,6 +29,9 @@ const ProfileSection = ({ logOutFunction = () => { } }) => {
     useEffect(() => {
         const downloadUserData = async () => {
             const userData = await getUser(logOutFunction)
+            if (userData === undefined) return
+            if (userData === null) return
+            if (userData.length <= 5) return
             setEmail(userData.Email)
             setFirstName(userData.Username.split(' ')[0])
             setLastName(userData.Username.split(' ')[1])
@@ -38,7 +41,7 @@ const ProfileSection = ({ logOutFunction = () => { } }) => {
     return (
         <div>
             <div className='card w-100' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }} data-bs-toggle="modal" data-bs-target={"#profileDetails"}>
-                <div className='card-body d-flex justify-content-start align-items-center p-2' style={{ overflowY: 'scroll' }}>
+                <div className='card-body d-flex justify-content-start align-items-center p-2 scroll'>
                     <div className='rounded-circle bg-success p-3 text-light d-flex align-items-center justify-content-center' style={{ width: '50px', height: '50px' }}>S</div>
                     <div className='ms-2' style={{ lineHeight: '1.2' }}>
                         <div className='fw-bold fs-6'>{firstName} {lastName}</div>

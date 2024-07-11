@@ -14,9 +14,21 @@ const getAllTasks = async (userId) => {
     return tasksObj;
 };
 
-const createTask = async (userId, title, description, dueDate) => {
+const getAllTasksByCategoryId = async (user_id, categoryId) => {
     const connection = await pool.getConnection();
-    const [result] = await connection.query('INSERT INTO tasks (user_id, title, description, due_date) VALUES (?, ?, ?, ?)', [userId, title, description, dueDate]);
+    const [rows] = await connection.query('SELECT * FROM tasks WHERE user_id = ? AND category_id = ?', [user_id, categoryId]);
+    let tasksObj = rows.map(task => {
+        // Convert the datetime from UTC to local timezone
+        task.due_date = moment.utc(task.due_date).tz('Asia/kolkata').format('YYYY-MM-DD HH:mm:ss');
+        return task;
+    });
+    connection.release()
+    return tasksObj;
+}
+
+const createTask = async (userId, category_id, title, description, dueDate) => {
+    const connection = await pool.getConnection();
+    const [result] = await connection.query('INSERT INTO tasks (user_id, category_id, title, description, due_date) VALUES (?, ?, ?, ?, ?)', [userId, category_id, title, description, dueDate]);
     connection.release()
     return result.insertId;
 };
@@ -33,4 +45,4 @@ const deleteTask = async (taskId) => {
     connection.release()
 };
 
-module.exports = { getAllTasks, createTask, updateTask, deleteTask }; 
+module.exports = { getAllTasks, getAllTasksByCategoryId, createTask, updateTask, deleteTask }; 

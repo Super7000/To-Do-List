@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import register, { login } from '../scripts/apiCalls';
+import { login, register } from '../scripts/API Calls/authApiCalls';
 
 function LogInPage({ setIsLogIn }) {
     const [isSignInState, setIsSignInState] = useState(false)

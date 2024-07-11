@@ -1,57 +1,7 @@
-const apiUrl = 'http://localhost:5000'; // Replace with your API URL
-
-// Function to handle login
-const login = async (email, password, successfullFuncCallBack = () => { }) => {
-    try {
-        const response = await fetch(`${apiUrl}/api/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('logedIn', 'true');
-            alert('Login successful');
-            successfullFuncCallBack()
-        } else {
-            alert(data.message);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-    }
-};
-
-// Function to handle registration
-const register = async (username, email, password) => {
-    try {
-        const response = await fetch(`${apiUrl}/api/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, email, password }),
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-            alert('Registration successful');
-        } else {
-            alert(data.message);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-    }
-};
-
-export default register
-export { login, addTask, getTasks }
+import { apiUrl } from '../apiUrl.js';
 
 // Function to add a task
-const addTask = async (title, description, dueDate, successfullFuncCallBack = () => { }) => {
+const addTask = async (category_id, title, description, dueDate, successfullFuncCallBack = () => { }) => {
     const token = localStorage.getItem('token');
     try {
         const response = await fetch(`${apiUrl}/api/tasks`, {
@@ -60,7 +10,7 @@ const addTask = async (title, description, dueDate, successfullFuncCallBack = ()
                 'Content-Type': 'application/json',
                 'authorization': `${token}`,
             },
-            body: JSON.stringify({ title, description, dueDate }),
+            body: JSON.stringify({ category_id, title, description, dueDate }),
         });
 
         const data = await response.json();
@@ -76,12 +26,11 @@ const addTask = async (title, description, dueDate, successfullFuncCallBack = ()
     }
 };
 
-// Function to get tasks
-const getTasks = async (onErrCallBack = () => { }) => {
+const getTasksByCategoryId = async (categoryId, onErrCallBack = () => { }) => {
     const token = localStorage.getItem('token');
     let tasksObj = [];
     try {
-        const response = await fetch(`${apiUrl}/api/tasks`, {
+        const response = await fetch(`${apiUrl}/api/tasks/category/${categoryId}`, {
             headers: {
                 'authorization': `${token}`,
             },
@@ -155,36 +104,4 @@ const updateTask = async (taskId, title, description, dueDate, completed, succes
     }
 };
 
-// Function to get user information
-const getUser = async (onErrFunc = () => { }) => {
-    const token = localStorage.getItem('token');
-    try {
-        const response = await fetch(`${apiUrl}/api/user`, {
-            headers: {
-                'authorization': `${token}`,
-            },
-        });
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                // Handle unauthorized error (e.g., redirect to login page)
-                console.log('Unauthorized access');
-                // Example: redirect to login page
-                onErrFunc();
-            } else {
-                // Handle other HTTP errors
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-        }
-
-        return response.json();
-    } catch (error) {
-        console.error('Error:', error);
-    }
-};
-
-export { getUser };
-
-export { updateTask };
-
-export { deleteTask };
+export { addTask, getTasksByCategoryId, deleteTask, updateTask };

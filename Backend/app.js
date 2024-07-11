@@ -1,18 +1,20 @@
-const express = require('express'); 
-const bodyParser = require('body-parser'); 
-const authRoutes = require('./routes/authRoutes'); 
-const taskRoutes = require('./routes/taskRoutes'); 
-const userRoutes = require('./routes/userRoutes'); 
+const express = require('express');
+const bodyParser = require('body-parser');
+const authRoutes = require('./routes/authRoutes');
+const taskRoutes = require('./routes/taskRoutes');
+const userRoutes = require('./routes/userRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 const cors = require('cors');
-require('dotenv').config(); 
+require('dotenv').config();
 const path = require('path');
- 
-const app = express(); 
-app.use(bodyParser.json()); 
- 
-app.use('/api/tasks', taskRoutes); 
-app.use('/api/user', userRoutes); 
-app.use('/api/auth', authRoutes); 
+
+const app = express();
+app.use(bodyParser.json());
+
+app.use('/api/tasks', taskRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use(cors());
 
 
@@ -27,5 +29,5 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`); 
+    console.log(`Server running on port ${PORT}`);
 }); 
