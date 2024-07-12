@@ -1,3 +1,13 @@
+.left-side-bar-bg {
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    z-index: -1;
+}
+
 .form-container {
     width: min(95%, 400px);
     justify-self: center;
@@ -64,4 +74,8 @@
 
 .btn {
     border-width: 0;
+}
+
+.modal-backdrop {
+    --bs-backdrop-opacity: 0.1;
 }

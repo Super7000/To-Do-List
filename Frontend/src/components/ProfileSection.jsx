@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getUser } from '../scripts/API Calls/userApiCalls';
+import { getUser, updateUserDetails } from '../scripts/API Calls/userApiCalls';
 
 const ProfileSection = ({ logOutFunction = () => { } }) => {
     const [firstName, setFirstName] = useState('User')
@@ -72,9 +72,9 @@ const ProfileSection = ({ logOutFunction = () => { } }) => {
                                     <input type="email" name="email" value={email} placeholder='Enter Email' onChange={inputChangeHandler} className='form-control' />
                                 </label>
                                 <label className='form-label'>
-                                    Reset Password:
+                                    Password:
                                     <div className='input-group'>
-                                        <input type={showPassword ? "text" : "password"} name="password" value={password} placeholder='Enter a new Password' onChange={inputChangeHandler} className='form-control border-end-0 rounded-start' />
+                                        <input type={showPassword ? "text" : "password"} name="password" value={password} placeholder='Enter Password' onChange={inputChangeHandler} className='form-control border-end-0 rounded-start' />
                                         <button className='btn btn-transparant border border-start-0' onClick={e => {
                                             e.preventDefault()
                                             setShowPassword(val => !val)
@@ -87,7 +87,9 @@ const ProfileSection = ({ logOutFunction = () => { } }) => {
                         </div>
 
                         <div className="modal-footer border-0">
-                            <button type="button" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
+                            <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={async () => {
+                                updateUserDetails(firstName + ' ' + lastName, email, password, logOutFunction).then(data => logOutFunction())
+                            }}>Save</button>
                             <button type="button" className="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
                         </div>
 

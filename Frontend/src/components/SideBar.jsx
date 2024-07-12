@@ -3,20 +3,43 @@ import ProfileSection from './ProfileSection';
 import { addCategory, getCategories, updateCategory } from '../scripts/API Calls/categoryApiCalls';
 
 function SideBar({ closeSideBar, logOutFunction = () => { }, activeCategory, setActiveCategory }) {
+    const sidebar = useRef()
+    const [width, setWidth] = useState(0)
+    function adjustWidth() {
+        setWidth(sidebar.current.offsetWidth)
+    }
+    useEffect(() => {
+        window.addEventListener('resize', (e) => {
+            adjustWidth()
+        })
+        adjustWidth()
+    }, [])
+    const [searchValue, setSearchValue] = useState('')
     return (
-        <div className='left-side-bar p-3 col d-flex flex-column bg-glass bg-light-white' style={{ maxHeight: '100vh' }}>
+        <div className='left-side-bar p-3 col d-flex flex-column bg-light-white' style={{ maxHeight: '100vh' }} ref={sidebar}>
+            <div className='left-side-bar-bg' style={{ width: width + 'px' }}></div>
             <div className='flex-grow-1 scroll'>
                 <div className='input-group d-flex align-items-center'>
-                    <input type='text' placeholder='Search' className='form-control border-end-0 h-100'></input>
+                    <input
+                        type='text'
+                        placeholder='Search'
+                        className='form-control border-end-0 h-100'
+                        value={searchValue}
+                        onChange={e => setSearchValue(e.target.value)}
+                    ></input>
                     <button className='btn btn-transparant border border-start-0 rounded-end bg-white py-1'>
-                        <img src='search.svg'></img>
+                        {searchValue.trim().length <= 0 ? <img src='search.svg'></img> : <button className='btn-close' onClick={e => setSearchValue('')}></button>}
                     </button>
                     <button className='btn bg-transparant h-100 ms-1 me-0 pe-2' onClick={closeSideBar}>
                         <img src="menu.svg"></img>
                     </button>
                 </div>
                 {/* <ImportantCategories /> */}
-                <Categorys activeCategory={activeCategory} setActiveCategory={setActiveCategory} logOutFunction={logOutFunction} />
+                <Categorys
+                    activeCategory={activeCategory}
+                    setActiveCategory={setActiveCategory}
+                    logOutFunction={logOutFunction}
+                    searchValue={searchValue} />
             </div>
             <ProfileSection logOutFunction={logOutFunction} />
             <button className='btn btn-primary mt-3' style={{ whiteSpace: 'nowrap' }} title='Log Out' onClick={logOutFunction}>
@@ -45,7 +68,7 @@ function ImportantCategories() {
     )
 }
 
-function Categorys({ activeCategory, setActiveCategory, logOutFunction = () => { } }) {
+function Categorys({ activeCategory, setActiveCategory, logOutFunction = () => { }, searchValue = '' }) {
     const [categorys, setCategorys] = useState([])
     async function downloadCategories() {
         getCategories(logOutFunction).then((data) => {
@@ -61,14 +84,18 @@ function Categorys({ activeCategory, setActiveCategory, logOutFunction = () => {
             else setActiveCategory(data[0])
         })
     }, [])
-
+    useEffect(() => {
+        if (searchValue.trim() === '') setFiltedCategorys(categorys)
+        else setFiltedCategorys(categorys.filter(category => category.name.trim().toLowerCase().includes(searchValue.trim().toLowerCase())))
+    }, [searchValue, categorys])
+    const [filtedCategorys, setFiltedCategorys] = useState([])
     return (
         <div className='mt-4 flex-grow-1'>
             <h5 className='fw-bold'>Categorys</h5>
             <div className='d-flex flex-column scroll' style={{ gap: '0.3rem' }} >
                 {
-                    categorys.length <= 0 ? <div className='m-auto'>No Categories</div> :
-                        categorys.map((category) => {
+                    filtedCategorys.length <= 0 ? <div className='m-auto'>No Categories</div> :
+                        filtedCategorys.map((category) => {
                             return <CategoryCard
                                 name={category.name}
                                 key={category.category_id}

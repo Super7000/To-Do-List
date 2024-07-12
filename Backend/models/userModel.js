@@ -16,9 +16,16 @@ const createUser = async (username, email, hashedPassword) => {
 
 const getUserById = async (userId) => {
     const connection = await pool.getConnection();
-    const [rows] = await connection.query('SELECT ID, Username, Email, Created_At FROM User_Details WHERE ID = ?', [userId]);
+    const [rows] = await connection.query('SELECT ID, Username, Email, Created_At, Password FROM User_Details WHERE ID = ?', [userId]);
     connection.release();
     return rows[0];
 };
 
-module.exports = { getUserByEmail, createUser, getUserById }; 
+const updateUserDetails = async (name, email, userId) => {
+    const connection = await pool.getConnection();
+    const [result] = await connection.query('UPDATE User_Details SET Username = ?, Email = ? WHERE ID = ?', [name, email, userId]);
+    connection.release();
+    return result.affectedRows;
+};
+
+module.exports = { getUserByEmail, createUser, getUserById, updateUserDetails }; 
