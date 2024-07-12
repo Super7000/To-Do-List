@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ProfileSection from './ProfileSection';
-import { addCategory, getCategories } from '../scripts/API Calls/categoryApiCalls';
+import { addCategory, getCategories, updateCategory } from '../scripts/API Calls/categoryApiCalls';
 
 function SideBar({ closeSideBar, logOutFunction = () => { }, activeCategory, setActiveCategory }) {
     return (
-        <div className='left-side-bar p-3 col d-flex flex-column' style={{ backgroundColor: 'rgba(0,0,0,0.04)', maxHeight: '100vh' }}>
+        <div className='left-side-bar p-3 col d-flex flex-column bg-glass bg-light-white' style={{ maxHeight: '100vh' }}>
             <div className='flex-grow-1 scroll'>
                 <div className='input-group d-flex align-items-center'>
                     <input type='text' placeholder='Search' className='form-control border-end-0 h-100'></input>
-                    <button className='btn btn-transparant border border-start-0 rounded-end bg-white'>
+                    <button className='btn btn-transparant border border-start-0 rounded-end bg-white py-1'>
                         <img src='search.svg'></img>
                     </button>
                     <button className='btn bg-transparant h-100 ms-1 me-0 pe-2' onClick={closeSideBar}>
@@ -47,12 +47,21 @@ function ImportantCategories() {
 
 function Categorys({ activeCategory, setActiveCategory, logOutFunction = () => { } }) {
     const [categorys, setCategorys] = useState([])
-    useEffect(() => {
+    async function downloadCategories() {
         getCategories(logOutFunction).then((data) => {
             setCategorys(data)
         })
+    }
+    useEffect(() => {
+        downloadCategories()
     }, [activeCategory])
-    const [categoryName, setCategoryName] = useState('')
+    useEffect(() => {
+        getCategories(logOutFunction).then((data) => {
+            if (data.length <= 0) return;
+            else setActiveCategory(data[0])
+        })
+    }, [])
+
     return (
         <div className='mt-4 flex-grow-1'>
             <h5 className='fw-bold'>Categorys</h5>
@@ -60,49 +69,24 @@ function Categorys({ activeCategory, setActiveCategory, logOutFunction = () => {
                 {
                     categorys.length <= 0 ? <div className='m-auto'>No Categories</div> :
                         categorys.map((category) => {
-                            return <CategoryCard name={category.name} key={category.category_id} active={category.category_id === activeCategory.category_id} onClickHandler={() => {
-                                setActiveCategory(category)
-                            }} />
+                            return <CategoryCard
+                                name={category.name}
+                                key={category.category_id}
+                                id={category.category_id}
+                                active={category.category_id === activeCategory.category_id}
+                                setActiveCategory={setActiveCategory}
+                                onClickHandler={() => {
+                                    setActiveCategory(category)
+                                }} />
                         })
                 }
-                <div className='card cursor-pointer' data-bs-toggle="modal" data-bs-target={"#categorypopup"}>
+                <div className='card cursor-pointer' onClick={async () => {
+                    addCategory("Category").then(() => {
+                        downloadCategories()
+                    })
+                }}>
                     <div className='card-body p-1'>
                         <div className={'text text-center fs-5'}>{'+'}</div>
-                    </div>
-                </div>
-
-                <div className="modal" id={"categorypopup"}>
-                    <div className="modal-dialog w-100">
-                        <div className="modal-content">
-
-                            <div className="modal-header border-0">
-                                <h4 className="modal-title">Add a Category</h4>
-                                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-
-                            <div className="modal-body">
-                                <form className='form card-body d-flex flex-column px-5'>
-                                    <div>
-                                        <label className='form-label'>
-                                            Category Name:
-                                            <input type="text" name="date" value={categoryName} placeholder='Enter a Category Name' onChange={e => setCategoryName(e.target.value)} className='form-control mt-2' />
-                                        </label>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div className="modal-footer border-0">
-                                <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={() => {
-                                    addCategory(categoryName).then(() => {
-                                        getCategories(logOutFunction).then((data) => {
-                                            setCategorys(data)
-                                        })
-                                    })
-                                }}>Save</button>
-                                <button type="button" className="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
-                            </div>
-
-                        </div>
                     </div>
                 </div>
             </div>
@@ -110,11 +94,28 @@ function Categorys({ activeCategory, setActiveCategory, logOutFunction = () => {
     )
 }
 
-function CategoryCard({ name = "Category", id, active = false, onClickHandler = () => { } }) {
+function CategoryCard({ name = "Category", id, active = false, onClickHandler = () => { }, setActiveCategory = () => { } }) {
+    const [readOnly, setReadOnly] = useState(true)
+    const [categoryName, setCategoryName] = useState(name)
+    const inputBox = useRef()
     return (
-        <div className={'card cursor-pointer' + (active ? " bg-primary" : "")} onClick={onClickHandler}>
-            <div className='card-body p-2'>
-                <div className={'text' + (active ? " text-light" : "")}>{name}</div>
+        <div className={'card cursor-pointer' + (active ? " bg-primary" : " bg-deep-white")} onClick={onClickHandler}>
+            <div className='card-body p-2 input-group'>
+                <input
+                    ref={inputBox}
+                    value={categoryName}
+                    readOnly={readOnly}
+                    className={'text border border-0 bg-transparant flex-grow-1 py-0 ms-1' + (readOnly ? ' cursor-pointer' : "") + (active ? " text-light" : "")}
+                    style={{ outline: 'none' }}
+                    onBlur={e => updateCategory(id, categoryName).then(data => { setReadOnly(true); setActiveCategory(val => { return { ...val, name: categoryName } }) })}
+                    onChange={e => {
+                        setCategoryName(e.target.value)
+                    }}
+                    onDoubleClick={e => { setReadOnly(false); inputBox.current.focus() }}
+                ></input>
+                <button className='btn py-0' onClick={e => { setReadOnly(false); inputBox.current.focus() }}>
+                    <img src={'edit' + (active ? '-white' : '') + '.svg'} width={18} height={18}></img>
+                </button>
             </div>
         </div>
     )

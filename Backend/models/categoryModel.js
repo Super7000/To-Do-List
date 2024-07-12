@@ -28,6 +28,7 @@ const updateCategory = async (category_id, name) => {
 
 const deleteCategory = async (category_id) => {
     const connection = await pool.getConnection();
+    await connection.query('DELETE FROM tasks WHERE category_id = ?', [category_id]);
     await connection.query('DELETE FROM categories WHERE category_id = ?', [category_id]);
     connection.release()
 };

@@ -46,14 +46,21 @@ function LogInPage({ setIsLogIn }) {
                     <p>Welcome to,</p>
                     <p className='fw-bolder text-primary'>To Dos</p>
                 </h1>
-                <div className='card p-4'>
+                <div className='card p-4 bg-glass bg-light-white'>
                     {/* log in form */}
                     <form className='form card-body d-flex flex-column' style={{ gap: (!isSignInState ? '1rem' : '0.5rem') }}>
                         {!isSignInState && <>
                             <div>
                                 <label className='form-label'>
                                     Email:
-                                    <input type="text" name="email" value={email} placeholder='Enter Email' onChange={inputHandler} className='form-control' />
+                                    <input
+                                        type="text"
+                                        name="email"
+                                        value={email}
+                                        placeholder='Enter Email'
+                                        onChange={inputHandler}
+                                        className='form-control bg-deep-white'
+                                    />
                                 </label>
                             </div>
                             <div>
@@ -65,7 +72,7 @@ function LogInPage({ setIsLogIn }) {
                                             name="password" value={password}
                                             placeholder='Enter Password'
                                             onChange={inputHandler}
-                                            className='form-control border-end-0 rounded-start'
+                                            className='form-control border-end-0 rounded-start bg-deep-white'
                                             onKeyDown={e => {
                                                 if (e.key === 'Enter' || e.keyCode === 13) {
                                                     e.preventDefault()
@@ -73,7 +80,7 @@ function LogInPage({ setIsLogIn }) {
                                                 }
                                             }}
                                         />
-                                        <button className='btn btn-transparant border border-start-0' onClick={e => {
+                                        <button className='btn btn-transparant border border-start-0 bg-deep-white' onClick={e => {
                                             e.preventDefault()
                                             setShowPassword(val => !val)
                                         }}>

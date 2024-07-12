@@ -20,6 +20,9 @@ function ToDosPage({ setIsLogIn }) {
         <div className='h-100' style={{ transition: '0.3s', display: 'grid', gridTemplateColumns: (showSideBar ? ('min(35%,400px) auto') : '100%') }}>
             {showSideBar && <SideBar closeSideBar={closeSideBar} logOutFunction={logOutFunction} activeCategory={activeCategory} setActiveCategory={setActiveCategory} />}
             {activeCategory.length <= 0 ? <div className='m-auto'>Create a category first</div> : <Tasks logOutFunction={logOutFunction} activeCategory={activeCategory} setActiveCategory={setActiveCategory} />}
+            {!showSideBar && <div className='rounded-end bg-mid-white p-3' style={{ position: 'fixed', bottom: '1rem', left: 0 }} onClick={e => setShowSideBar(true)}>
+                <img src='menu.svg'></img>
+            </div>}
         </div>
     );
 }
@@ -44,11 +47,13 @@ function Tasks({ logOutFunction = () => { }, activeCategory, setActiveCategory }
         <div className='col p-3 d-flex flex-column' style={{ gap: '0.5rem', overflowY: 'scroll', maxHeight: '100vh' }}>
             <div className='d-flex justify-content-between'>
                 <div>
-                    <div className='fw-bold fs-3' style={{ lineHeight: 1.2 }}>{activeCategory.name} <p className='text-muted m-0' style={{ fontSize: '0.8rem' }}>ID: {activeCategory.category_id}</p></div>
+                    <div className='fw-bold fs-3' style={{ lineHeight: 1.2 }}>
+                        {activeCategory.name} <p className='text-muted m-0' style={{ fontSize: '0.8rem' }}>ID: {activeCategory.category_id}</p>
+                    </div>
                     <div className='fs-6 text-secondary mt-1'>{activeCategory.created_at}</div>
                 </div>
                 <div className='d-flex align-items-center'>
-                    <button className='btn btn-secondary px-2 py-0 pb-2 border-0' style={{ backgroundColor: 'rgba(0,0,0,0.2)' }} onClick={async () => {
+                    <button className='btn px-3 py-2 pb-3 border-0 bg-mid-white' onClick={async () => {
                         deleteCategory(activeCategory.category_id, async () => {
                             getCategories().then((data) => {
                                 setActiveCategory(data[0])
@@ -74,7 +79,7 @@ function Tasks({ logOutFunction = () => { }, activeCategory, setActiveCategory }
                     addTask(activeCategory.category_id, 'Task', 'Description', dueDate + ' ' + dueTime, downloadAllTasks)
                 }}
             />
-            <button className='rounded ms-auto mt-auto p-3 border-0' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }} data-bs-toggle="modal" data-bs-target={"#addTaskPopup"}>
+            <button className='rounded ms-auto mt-auto p-3 border-0 bg-glass bg-deep-white' data-bs-toggle="modal" data-bs-target={"#addTaskPopup"}>
                 <div className='btn-close' style={{ transform: 'rotate(45deg)' }}></div>
             </button>
         </div>
@@ -131,7 +136,7 @@ function Task({
     }
     return (
         <>
-            <form className={'card' + (completed ? " border border-2 border-success" : "")} onDoubleClick={e => {
+            <form className={'card bg-mid-white' + (completed ? " border border-1 border-success bg-light-green" : " ")} onDoubleClick={e => {
                 e.currentTarget.style.cssText = 'border: 2px solid dodgerblue;'
             }}>
                 <div className='card-body'>
@@ -142,7 +147,7 @@ function Task({
                             </label>
                         </div>
                         <input
-                            className='text-dark fw-bold border-0 form-control'
+                            className='text-dark fw-bold border-0 form-control bg-transparent me-3'
                             style={{ textDecoration: (completed ? "line-through" : "none") }}
                             name='title'
                             placeholder='Task'

@@ -92,7 +92,7 @@ const updateCategory = async (categoryId, name, successfullFuncCallBack = () => 
         });
 
         if (response.ok) {
-            alert('Category updated successfully');
+            // alert('Category updated successfully');
             successfullFuncCallBack()
         } else {
             const data = await response.json();
