@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DateTimePopUp from './DateTimePopUp';
+import { updateTask, deleteTask } from '../scripts/API Calls/tasksApiCalls';
 
 function Task({
     task_id = 1,
@@ -17,6 +18,7 @@ function Task({
     const [descriptionState, setDescriptionState] = useState(description)
     const [completedState, setCompletedState] = useState(completed)
 
+    {/*Handlers for Title and Description Inputs*/ }
     function onChangeHandler(e) {
         switch (e.target.name) {
             case 'title':
@@ -29,6 +31,8 @@ function Task({
                 break;
         }
     }
+
+    {/*calling the update api when user click outside of the task element*/ }
     function onBlurHandler(e) {
         switch (e.target.name) {
             case 'title':
@@ -49,16 +53,28 @@ function Task({
         else
             updateTask(task_id, titleState, descriptionState, due_date, false, downloadAllTasks, false)
     }
+
+    function deleteBtnClickHandler(e) {
+        e.preventDefault();
+        deleteTask(task_id, downloadAllTasks);
+    }
     return (
         <>
-            <form className={'card bg-mid-white' + (completed ? " border border-1 border-success bg-light-green" : " ")} onDoubleClick={e => {
-                e.currentTarget.style.cssText = 'border: 2px solid dodgerblue;'
-            }}>
+            <form
+                className={'card bg-glass bg-mid-white' + (completed ? " border border-1 border-success bg-light-green" : " ")}
+                onDoubleClick={e => {
+                    e.currentTarget.style.cssText = 'border: 2px solid dodgerblue;'
+                }}>
                 <div className='card-body'>
                     <div className='input-group d-flex align-items-center'>
                         <div className="form-check d-flex align-items-center">
                             <label className="form-check-label">
-                                <input className="form-check-input border-2 rounded-pill p-2 cursor-pointer" type="checkbox" name="completed" checked={completedState} onChange={e => completedBtnChangeHandler(e)} />
+                                <input
+                                    className="form-check-input border-2 rounded-pill p-2 cursor-pointer"
+                                    type="checkbox"
+                                    name="completed"
+                                    checked={completedState}
+                                    onChange={e => completedBtnChangeHandler(e)} />
                             </label>
                         </div>
                         <input
@@ -76,21 +92,25 @@ function Task({
                             }}
                         />
                         <div className='text-secondary ms-auto d-flex flex-column align-items-center cursor-pointer' data-bs-toggle="modal" data-bs-target={"#popup" + task_id}>
-                            <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (completed ? "line-through" : "none") }} >{due_date.split(' ')[0]}</p>
-                            <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (completed ? "line-through" : "none") }} >{due_date.split(' ')[1]}</p>
+                            <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (completed ? "line-through" : "none") }} >
+                                {due_date.split(' ')[0]}
+                            </p>
+                            <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (completed ? "line-through" : "none") }} >
+                                {due_date.split(' ')[1]}
+                            </p>
                         </div>
-                        <button className='btn ms-2' onClick={e => {
-                            e.preventDefault();
-                            deleteTask(task_id, downloadAllTasks);
-                        }}>
+                        <button className='btn ms-2' onClick={deleteBtnClickHandler}>
                             <img src='delete.svg' width={18} height={18}></img>
                         </button>
-                        <div className='btn btn-transparant dropdown-toggle border-0' data-bs-toggle="collapse" data-bs-target={"#" + task_id}></div>
+                        <div
+                            className='btn btn-transparant dropdown-toggle border-0'
+                            data-bs-toggle="collapse"
+                            data-bs-target={"#" + task_id}></div>
                     </div>
                     <textarea
                         id={task_id}
                         name='description'
-                        className="collapse form-control mt-1"
+                        className="collapse form-control mt-1 bg-deep-white"
                         rows={3}
                         style={{ resize: 'none' }}
                         value={descriptionState}

@@ -1,29 +1,9 @@
 import React, { useState } from 'react';
+import { formatDate, getCurrentTime } from '../scripts/utils';
 
 function DateTimePopUp({ heading, saveBtnClickHandler = (a, b) => { }, id, onChangeClickHanlder = (e) => { }, defaultDueDate, defaultDueTime }) {
-    function getCurrentTime() {
-        const now = new Date();
-
-        let hours = now.getHours();
-        let minutes = now.getMinutes();
-
-        // Ensure two digits for hours
-        hours = hours < 10 ? `0${hours}` : hours;
-
-        const time = `${hours}:${minutes}`;
-
-        return time;
-    }
-
-    function formatDate(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
     const [dueDate, setDueDate] = useState(defaultDueDate ? defaultDueDate : formatDate(new Date()))
-    const [dueTime, setDueTime] = useState(defaultDueTime ? defaultDueTime : getCurrentTime())
+    const [dueTime, setDueTime] = useState(defaultDueTime ? defaultDueTime : getCurrentTime());
 
     function onChangeClickHanlderInner(e) {
         switch (e.target.name) {
@@ -53,20 +33,35 @@ function DateTimePopUp({ heading, saveBtnClickHandler = (a, b) => { }, id, onCha
                             <div>
                                 <label className='form-label'>
                                     Due Date:
-                                    <input type="date" name="date" value={dueDate} placeholder='Select a Date' onChange={onChangeClickHanlderInner} className='form-control mt-2 bg-deep-white' />
+                                    <input
+                                        type="date"
+                                        name="date"
+                                        value={dueDate}
+                                        placeholder='Select a Date'
+                                        onChange={onChangeClickHanlderInner}
+                                        className='form-control mt-2 bg-deep-white' />
                                 </label>
                             </div>
                             <div>
                                 <label className='form-label'>
                                     Due Time:
-                                    <input type="time" name="time" value={dueTime} placeholder='Select a time' onChange={onChangeClickHanlderInner} className='form-control mt-2 bg-deep-white' />
+                                    <input
+                                        type="time"
+                                        name="time"
+                                        value={dueTime}
+                                        placeholder='Select a time'
+                                        onChange={onChangeClickHanlderInner}
+                                        className='form-control mt-2 bg-deep-white' />
                                 </label>
                             </div>
                         </form>
                     </div>
 
                     <div className="modal-footer border-0">
-                        <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={() => saveBtnClickHandler(dueDate, dueTime)}>Save</button>
+                        <button type="submit" className="btn btn-primary" data-bs-dismiss="modal" onClick={(e) => {
+                            e.preventDefault()
+                            saveBtnClickHandler(dueDate, dueTime)
+                        }}>Save</button>
                         <button type="button" className="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
                     </div>
 

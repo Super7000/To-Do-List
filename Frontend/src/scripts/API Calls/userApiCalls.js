@@ -48,8 +48,14 @@ const updateUserDetails = async (name, email, password = '', onErrFunc = () => {
                 onErrFunc();
             } else {
                 // Handle other HTTP errors
+                const data = await response.json();
+                alert(data.message);
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
+        }
+        
+        if(response.status === 200) {
+            alert('User details updated successfully');
         }
 
         return response.json();

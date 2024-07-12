@@ -5,6 +5,22 @@ const envVariables = require('../config/config.js');
 
 const register = async (req, res) => {
     const { username, email, password } = req.body;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!emailRegex.test(email.trim())) {
+        return res.status(400).json({ message: 'Invalid email format' });
+    }
+    if (password.length < 8) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+    }
+    if (email.trim() === '' || password === '') {
+        return res.status(400).json({ message: 'Fields cannot be empty' });
+    }
+    if (!nameRegex.test(username.trim())) {
+        return res.status(400).json({ message: 'Invalid username format' });
+    }
+
     try {
         const existingUser = await getUserByEmail(email);
         if (existingUser) {
@@ -21,6 +37,18 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     const { email, password } = req.body;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+        return res.status(400).json({ message: 'Invalid email format' });
+    }
+    if (password.length < 8) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+    }
+    if (email.trim() === '' || password === '') {
+        return res.status(400).json({ message: 'Fields cannot be empty' });
+    }
+
     try {
         const user = await getUserByEmail(email);
         if (!user) {

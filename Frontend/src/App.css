@@ -78,4 +78,7 @@
 
 .modal-backdrop {
     --bs-backdrop-opacity: 0.1;
+    --bs-backdrop-bg: rgba(0, 0, 0, 0.2);
+    opacity: 1 !important;
+    backdrop-filter: blur(5px);
 }

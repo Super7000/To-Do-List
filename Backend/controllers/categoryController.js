@@ -11,6 +11,11 @@ const getCategories = async (req, res) => {
 
 const addCategory = async (req, res) => {
     const { name } = req.body;
+
+    if (name && (typeof name !== 'string' || name.trim() === '')) {
+        return res.status(400).json({ message: 'Invalid name' });
+    }
+
     try {
         const categoryId = await createCategory(req.user.userId, name);
         res.status(201).json({ categoryId });
@@ -22,6 +27,11 @@ const addCategory = async (req, res) => {
 const updateCategoryById = async (req, res) => {
     const { categoryId } = req.params;
     const { name } = req.body;
+
+    if (name && (typeof name !== 'string' || name.trim() === '')) {
+        return res.status(400).json({ message: 'Invalid name' });
+    }
+
     try {
         await updateCategory(categoryId, name);
         res.status(204).end();

@@ -57,4 +57,23 @@ function convert24hrTo12hr(time24hr) {
     return time12hr;
 }
 
-export { convert12hrTo24hr, convert24hrTo12hr };
+function getCurrentTime() {
+    const now = new Date();
+
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+
+    // Ensure two digits for hours
+    hours = hours < 10 ? `0${hours}` : hours;
+
+    return `${hours}:${minutes}`;
+}
+
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+export { convert12hrTo24hr, convert24hrTo12hr, getCurrentTime, formatDate };
