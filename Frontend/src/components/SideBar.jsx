@@ -9,6 +9,7 @@ function SideBar({ closeSideBar, logOutFunction = () => { }, activeCategory, set
     const sidebar = useRef()
 
     function adjustWidth() {
+        if (sidebar.current === null) return
         setWidth(sidebar.current.offsetWidth)
     }
 
@@ -19,7 +20,7 @@ function SideBar({ closeSideBar, logOutFunction = () => { }, activeCategory, set
         adjustWidth()
     }, [])
     return (
-        <div className='left-side-bar p-3 col d-flex flex-column bg-light-white' style={{ maxHeight: '100vh' }} ref={sidebar}>
+        <div className='left-side-bar p-3 col d-flex flex-column bg-light-white align-items-between' style={{ maxHeight: '100vh' }} ref={sidebar}>
             <div className='left-side-bar-bg' style={{ width: width + 'px' }}></div>
             <div className='flex-grow-1 scroll'>
                 <div className='input-group d-flex align-items-center'>

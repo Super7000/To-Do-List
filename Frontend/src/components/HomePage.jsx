@@ -4,6 +4,7 @@ import { addTask, getTasksByCategoryId } from '../scripts/API Calls/tasksApiCall
 import { deleteCategory, getCategories } from '../scripts/API Calls/categoryApiCalls';
 import Task from './TaskCard';
 import DateTimePopUp from './DateTimePopUp';
+import { getCurrentTime } from '../scripts/utils';
 
 function HomePage({ setIsLogIn }) {
     const [showSideBar, setShowSideBar] = useState(true)
@@ -71,7 +72,7 @@ function Tasks({ logOutFunction = () => { }, activeCategory, setActiveCategory }
     }
 
     return (
-        <div className='col p-3 d-flex flex-column' style={{ gap: '0.5rem', overflowY: 'scroll', maxHeight: '100vh' }}>
+        <div className='col p-3 d-flex flex-column tasks-container scroll' style={{ gap: '0.5rem', overflowY: 'scroll', maxHeight: '100vh' }}>
             {/* Category Details or header */}
             <div className='d-flex justify-content-between'>
                 <div>
@@ -100,7 +101,7 @@ function Tasks({ logOutFunction = () => { }, activeCategory, setActiveCategory }
 
             {/* Add Task Button */}
             <button
-                className='rounded ms-auto mt-auto p-3 border-0 bg-glass bg-deep-white'
+                className='rounded m-3 me-4 p-3 border-0 bg-glass bg-deep-white bottom-0 end-0 position-fixed'
                 data-bs-toggle="modal"
                 data-bs-target={"#addTaskPopup"}>
                 <div className='btn-close' style={{ transform: 'rotate(45deg)' }}></div>
@@ -112,6 +113,7 @@ function Tasks({ logOutFunction = () => { }, activeCategory, setActiveCategory }
                 saveBtnClickHandler={async (dueDate, dueTime) => {
                     addTask(activeCategory.category_id, 'Task', 'Description', dueDate + ' ' + dueTime, downloadAllTasks)
                 }}
+                defaultDueTime={getCurrentTime()}
             />
         </div>
     )

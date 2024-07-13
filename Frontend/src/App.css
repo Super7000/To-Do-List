@@ -77,8 +77,43 @@
 }
 
 .modal-backdrop {
-    --bs-backdrop-opacity: 0.1;
+    /* --bs-backdrop-opacity: 0.1; */
     --bs-backdrop-bg: rgba(0, 0, 0, 0.2);
     opacity: 1 !important;
     backdrop-filter: blur(5px);
+}
+
+.modal.show .modal-dialog {
+    margin: auto;
+    margin-top: 10vh;
+}
+
+@media (max-width: 575px) {
+    /* CSS rules for extra small devices */
+}
+
+@media (max-width: 767px) {
+    /* CSS rules for small devices */
+    .left-side-bar {
+        position: fixed;
+        z-index: 2;
+    }
+    .tasks-container {
+        width: 100vw;
+    }
+    .card {
+        z-index: auto;
+    }
+}
+
+@media (max-width: 991px) {
+    /* CSS rules for medium devices */
+}
+
+@media (max-width: 1199px) {
+    /* CSS rules for large devices */
+}
+
+@media (max-width: 1399px) {
+    /* CSS rules for extra large devices */
 }

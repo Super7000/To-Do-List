@@ -60,6 +60,7 @@ function LogInPage({ setIsLogIn }) {
                                         placeholder='Enter Email'
                                         onChange={inputHandler}
                                         className='form-control bg-deep-white'
+                                        required
                                     />
                                 </label>
                             </div>
@@ -79,6 +80,7 @@ function LogInPage({ setIsLogIn }) {
                                                     loginBtn.current.click()
                                                 }
                                             }}
+                                            required
                                         />
                                         <button className='btn border border-start-0 bg-deep-white' onClick={e => {
                                             e.preventDefault()
@@ -160,7 +162,9 @@ function SignUpForm({ setIsSignInState }) {
                         value={email}
                         placeholder='Enter Email'
                         onChange={inputHandler}
-                        className='form-control' />
+                        className='form-control'
+                        required
+                    />
                 </label>
             </div>
             <div>
@@ -173,7 +177,9 @@ function SignUpForm({ setIsSignInState }) {
                             value={password}
                             placeholder='Enter Password'
                             onChange={inputHandler}
-                            className='form-control border-end-0 rounded-start' />
+                            className='form-control border-end-0 rounded-start'
+                            required
+                        />
                         <button className='btn bg-deep-white border border-start-0' onClick={e => {
                             e.preventDefault()
                             setShowPassword(val => !val)
@@ -192,7 +198,9 @@ function SignUpForm({ setIsSignInState }) {
                         value={confirmPassword}
                         placeholder='Re-enter the Password'
                         onChange={inputHandler}
-                        className='form-control' />
+                        className='form-control'
+                        required
+                    />
                 </label>
             </div>
             <div>
@@ -205,14 +213,18 @@ function SignUpForm({ setIsSignInState }) {
                             value={firstName}
                             onChange={inputHandler}
                             placeholder='First Name'
-                            className='form-control' />
+                            className='form-control'
+                            required
+                        />
                         <input
                             type="text"
                             name="lastName"
                             value={lastName}
                             onChange={inputHandler}
                             placeholder='Last Name'
-                            className='form-control' />
+                            className='form-control'
+                            required
+                        />
                     </div>
                 </label>
             </div>

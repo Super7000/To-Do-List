@@ -23,7 +23,7 @@ function DateTimePopUp({ heading, saveBtnClickHandler = (a, b) => { }, id, onCha
             <div className="modal-dialog w-100">
                 <div className="modal-content bg-glass bg-mid-white">
 
-                    <div className="modal-header border-0">
+                    <div className="modal-header border-0 px-4">
                         <h4 className="modal-title">{heading}</h4>
                         <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                     </div>

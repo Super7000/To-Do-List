@@ -1,6 +1,11 @@
 function verifyFieldsForLogIn(email, password) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    if (email.trim() === '' || password === '') {
+        alert('Fields cannot be empty');
+        return false;
+    }
+
     if (!emailRegex.test(email.trim())) {
         alert('Invalid email format');
         return false;
@@ -8,11 +13,6 @@ function verifyFieldsForLogIn(email, password) {
 
     if (password.length < 8) {
         alert('Password must be at least 8 characters long');
-        return false;
-    }
-
-    if (email.trim() === '' || password === '') {
-        alert('Fields cannot be empty');
         return false;
     }
     return true;

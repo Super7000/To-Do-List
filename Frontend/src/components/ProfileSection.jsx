@@ -9,6 +9,7 @@ const ProfileSection = ({ logOutFunction = () => { } }) => {
     const [password, setPassword] = useState('')
 
     const [showPassword, setShowPassword] = useState(false)
+    const [showProfileDetails, setShowProfileDetails] = useState(false)
 
     const saveBtn = useRef()
 
@@ -55,10 +56,7 @@ const ProfileSection = ({ logOutFunction = () => { } }) => {
 
     return (
         <div>
-            <div className='card w-100'
-                style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
-                data-bs-toggle="modal"
-                data-bs-target={"#profileDetails"}>
+            <div className='card w-100 mt-3 cursor-pointer' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }} onClick={e => setShowProfileDetails(true)}>
                 <div className='card-body d-flex justify-content-start align-items-center p-2 scroll'>
                     <div className='rounded-circle bg-success p-3 text-light d-flex align-items-center justify-content-center' style={{ width: '50px', height: '50px' }}>
                         {firstName.charAt(0).toUpperCase()}
@@ -72,85 +70,89 @@ const ProfileSection = ({ logOutFunction = () => { } }) => {
 
 
             {/* PopUp to update profile details or user details */}
-            <div className="modal" id="profileDetails">
-                <div className="modal-dialog w-100">
-                    <div className="modal-content bg-glass bg-mid-white">
-                        <div className="modal-header border-0 px-4">
-                            <h4 className="modal-title">Profile Details</h4>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
+            {showProfileDetails && <>
+                <div className='position-fixed top-0 start-0 bg-glass bg-light-black d-flex justify-content-center' style={{ width: '100%', minHeight: '100vh', zIndex: 5 }}>
+                    <div className="card rounded bg-glass bg-light-white position-fixed" style={{ zIndex: 5, top: '5%' }} id="profileDetails">
+                        <div className="modal-dialog rounded w-100">
+                            <div className="modal-content rounded bg-glass bg-mid-white">
+                                <div className="modal-header border-0 px-4 pt-4 justify-content-between">
+                                    <h4 className="modal-title">Profile Details</h4>
+                                    <button type="button" className="btn-close" onClick={e => setShowProfileDetails(false)}></button>
+                                </div>
 
-                        <div className="modal-body">
-                            <form className='form card-body d-flex flex-column px-5' style={{ gap: '0.8rem' }}>
-                                <label className='form-label'>
-                                    Name:
-                                    <div className='input-group'>
-                                        <input
-                                            type="text"
-                                            name="firstName"
-                                            value={firstName}
-                                            placeholder='First Name'
-                                            onChange={inputChangeHandler}
-                                            className='form-control bg-deep-white' />
-                                        <input
-                                            type="text"
-                                            name="lastName"
-                                            value={lastName}
-                                            placeholder='Last Name'
-                                            onChange={inputChangeHandler}
-                                            className='form-control bg-deep-white' />
-                                    </div>
-                                </label>
-                                <label className='form-label'>
-                                    Email:
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={email}
-                                        placeholder='Enter Email'
-                                        onChange={inputChangeHandler}
-                                        className='form-control bg-deep-white' />
-                                </label>
-                                <label className='form-label'>
-                                    Password:
-                                    <div className='input-group'>
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            name="password"
-                                            value={password}
-                                            placeholder='Enter Password'
-                                            onChange={inputChangeHandler}
-                                            className='form-control border-end-0 rounded-start bg-deep-white'
-                                            onKeyDown={e => {
-                                                if (e.key === 'Enter' || e.keyCode === 13) {
-                                                    e.preventDefault()
-                                                    saveBtn.current.click()
-                                                }
-                                            }}
-                                        />
-                                        <button
-                                            className='btn btn-transparant border border-start-0 bg-deep-white'
-                                            onClick={e => setShowPassword(val => !val)}>
-                                            <img src={showPassword ? 'eye-closed.svg' : 'eye.svg'}></img>
-                                        </button>
-                                    </div>
-                                </label>
-                            </form>
-                        </div>
+                                <div className="modal-body">
+                                    <form className='form card-body d-flex flex-column px-5' style={{ gap: '0.8rem' }}>
+                                        <label className='form-label'>
+                                            Name:
+                                            <div className='input-group'>
+                                                <input
+                                                    type="text"
+                                                    name="firstName"
+                                                    value={firstName}
+                                                    placeholder='First Name'
+                                                    onChange={inputChangeHandler}
+                                                    className='form-control bg-deep-white' />
+                                                <input
+                                                    type="text"
+                                                    name="lastName"
+                                                    value={lastName}
+                                                    placeholder='Last Name'
+                                                    onChange={inputChangeHandler}
+                                                    className='form-control bg-deep-white' />
+                                            </div>
+                                        </label>
+                                        <label className='form-label'>
+                                            Email:
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                value={email}
+                                                placeholder='Enter Email'
+                                                onChange={inputChangeHandler}
+                                                className='form-control bg-deep-white' />
+                                        </label>
+                                        <label className='form-label'>
+                                            Password:
+                                            <div className='input-group'>
+                                                <input
+                                                    type={showPassword ? "text" : "password"}
+                                                    name="password"
+                                                    value={password}
+                                                    placeholder='Enter Password'
+                                                    onChange={inputChangeHandler}
+                                                    className='form-control border-end-0 rounded-start bg-deep-white'
+                                                    onKeyDown={e => {
+                                                        if (e.key === 'Enter' || e.keyCode === 13) {
+                                                            e.preventDefault()
+                                                            saveBtn.current.click()
+                                                        }
+                                                    }}
+                                                />
+                                                <button
+                                                    className='btn btn-transparant border border-start-0 bg-deep-white'
+                                                    onClick={e => setShowPassword(val => !val)}>
+                                                    <img src={showPassword ? 'eye-closed.svg' : 'eye.svg'}></img>
+                                                </button>
+                                            </div>
+                                        </label>
+                                    </form>
+                                </div>
 
-                        <div className="modal-footer border-0">
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                data-bs-dismiss="modal"
-                                ref={saveBtn}
-                                onClick={onSubmitHandler}
-                            >Save</button>
-                            <button type="button" className="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+                                <div className="modal-footer border-0 px-5 pb-4" style={{ gap: '0.5rem' }}>
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        ref={saveBtn}
+                                        onClick={e => {
+                                            onSubmitHandler(e)
+                                        }}>Save</button>
+                                    <button type="button" className="btn btn-outline-primary" onClick={e => setShowProfileDetails(false)}>Close</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </>}
         </div>
     );
 };
