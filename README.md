@@ -19,3 +19,15 @@ I have used below configurations. If you want to use you own configuration do no
 **Step 5:** After that run `node app.js` command in Backend which will run the main server.
 
 **Step 6:** Now finally open this **URL**: `http://localhost:5000/` in your browser to use the app.
+
+# How to use the UI
+
+**Step 1:** First of all you have to create a account from create new account link in login page.
+
+**Step 2:** After that you have to login with the account, after successful login you will be redirected to main to do list page.
+
+**Step 3:** To add a task first you have to create a category or list.
+
+**Step 4:** you can add add a category by clicking `+` button from category section in menubar.
+
+**Step 5:** Then click the category in which you want to add tasks and press the `+` button at right bottom position of the page
