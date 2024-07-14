@@ -28,4 +28,12 @@ const updateUserDetails = async (name, email, userId) => {
     return result.affectedRows;
 };
 
-module.exports = { getUserByEmail, createUser, getUserById, updateUserDetails }; 
+const deleteUserByUid = async (userId) => {
+    const connection = await pool.getConnection();
+    await connection.query('DELETE FROM tasks WHERE user_id = ?', [userId]);
+    await connection.query('DELETE FROM categories WHERE user_id = ?', [userId]);
+    await connection.query('DELETE FROM User_Details WHERE ID = ?', [userId]);
+    connection.release()
+};
+
+module.exports = { getUserByEmail, createUser, getUserById, updateUserDetails, deleteUserByUid }; 

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { getUser, updateUserDetails } from '../scripts/API Calls/userApiCalls';
+import { deleteUser, getUser, updateUserDetails } from '../scripts/API Calls/userApiCalls';
 import { verifyFieldsForSignUp } from '../scripts/InputsVerifiers';
 
 const ProfileSection = ({ logOutFunction = () => { } }) => {
@@ -52,6 +52,14 @@ const ProfileSection = ({ logOutFunction = () => { } }) => {
                 .then(data => {
                     logOutFunction()
                 }) : ""
+    }
+
+    async function deleteBtnClickHandler() {
+        if (password.length < 8) {
+            alert('Password must be at least 8 characters long');
+            return false;
+        }
+        await deleteUser(password, logOutFunction)
     }
 
     return (
@@ -127,8 +135,10 @@ const ProfileSection = ({ logOutFunction = () => { } }) => {
                                                             saveBtn.current.click()
                                                         }
                                                     }}
+                                                    required
                                                 />
                                                 <button
+                                                    type='button'
                                                     className='btn btn-transparant border border-start-0 bg-deep-white'
                                                     onClick={e => setShowPassword(val => !val)}>
                                                     <img src={showPassword ? 'eye-closed.svg' : 'eye.svg'}></img>
@@ -139,14 +149,19 @@ const ProfileSection = ({ logOutFunction = () => { } }) => {
                                 </div>
 
                                 <div className="modal-footer border-0 px-5 pb-4" style={{ gap: '0.5rem' }}>
-                                    <button
-                                        type="button"
-                                        className="btn btn-primary"
-                                        ref={saveBtn}
-                                        onClick={e => {
-                                            onSubmitHandler(e)
-                                        }}>Save</button>
-                                    <button type="button" className="btn btn-outline-primary" onClick={e => setShowProfileDetails(false)}>Close</button>
+                                    <div className='me-auto'>
+                                        <button type='button' className='btn btn-danger rounded-pill' onClick={deleteBtnClickHandler}>Delete Account</button>
+                                    </div>
+                                    <div>
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary me-1"
+                                            ref={saveBtn}
+                                            onClick={e => {
+                                                onSubmitHandler(e)
+                                            }}>Save</button>
+                                        <button type="button" className="btn btn-outline-primary" onClick={e => setShowProfileDetails(false)}>Close</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

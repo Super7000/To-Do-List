@@ -15,6 +15,8 @@ It is a Full Stack To Do List Web Application created using ReactJS, Bootstrap 5
 
 **5.** UI is fully responsive on different types of devices.
 
+**6.** User Details/Data can be deleted anytime.
+
 
 # To use this app follow the below steps:
 

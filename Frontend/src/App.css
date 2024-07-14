@@ -72,6 +72,10 @@
     background: rgba(30, 143, 255, 0.7) !important;
 }
 
+.btn-danger {
+    background: rgba(255, 36, 36, 0.61);
+}
+
 .btn {
     border-width: 0;
 }
@@ -93,14 +97,17 @@
 }
 
 @media (max-width: 767px) {
+
     /* CSS rules for small devices */
     .left-side-bar {
         position: fixed;
         z-index: 2;
     }
+
     .tasks-container {
         width: 100vw;
     }
+
     .card {
         z-index: auto;
     }

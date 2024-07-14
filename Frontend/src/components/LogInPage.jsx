@@ -95,7 +95,7 @@ function LogInPage({ setIsLogIn }) {
                             <div>
                                 Don't have an account?
                                 <span className='text-primary cursor-pointer' onClick={() => setIsSignInState(true)}>
-                                    Create a new account
+                                    {' '}Create a new account
                                 </span>
                             </div>
                         </>}

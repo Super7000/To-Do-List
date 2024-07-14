@@ -53,8 +53,8 @@ const updateUserDetails = async (name, email, password = '', onErrFunc = () => {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
         }
-        
-        if(response.status === 200) {
+
+        if (response.status === 200) {
             alert('User details updated successfully');
         }
 
@@ -64,4 +64,29 @@ const updateUserDetails = async (name, email, password = '', onErrFunc = () => {
     }
 }
 
-export { getUser, updateUserDetails };
+const deleteUser = async (password, successfullFuncCallBack = () => { }) => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`${apiUrl}/api/user`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': `${token}`,
+            },
+            body: JSON.stringify({ password }),
+        });
+
+        if (response.ok) {
+            alert('User details deleted successfully');
+            successfullFuncCallBack()
+        } else {
+            const data = await response.json();
+            alert(data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+
+export { getUser, updateUserDetails, deleteUser };

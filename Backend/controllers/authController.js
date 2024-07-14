@@ -52,7 +52,7 @@ const login = async (req, res) => {
     try {
         const user = await getUserByEmail(email);
         if (!user) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+            return res.status(400).json({ message: 'No account is found with this email' });
         }
         const isMatch = await bcrypt.compare(password, user.Password);
         if (!isMatch) {

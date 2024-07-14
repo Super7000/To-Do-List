@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const { getUserById, updateUserDetails } = require('../models/userModel');
+const { getUserById, updateUserDetails, deleteUserByUid } = require('../models/userModel');
 
 const getUser = async (req, res) => {
     try {
@@ -46,5 +46,22 @@ const updateUser = async (req, res) => {
     }
 };
 
+const deleteUser = async (req, res) => {
+    try {
+        const user = await getUserById(req.user.userId);
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+        const isMatch = await bcrypt.compare(req.body.password, user.Password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid password' });
+        }
+        await deleteUserByUid(req.user.userId);
+        res.json({ message: 'User details deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 
-module.exports = { getUser, updateUser }; 
+
+module.exports = { getUser, updateUser, deleteUser }; 
