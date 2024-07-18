@@ -144,11 +144,10 @@ function SignUpForm({ setIsSignInState }) {
     async function registerUser(e) {
         e.preventDefault()
         if (verifyFieldsForSignUp(email, password, confirmPassword, firstName, lastName)) {
-            const response = await register(firstName.trim() + ' ' + lastName.trim(), email.trim(), password);
-            if (response) {
+            await register(firstName.trim() + ' ' + lastName.trim(), email.trim(), password, () => {
                 // Redirect to log in page
                 setIsSignInState(false)
-            }
+            })
         }
     }
     return (

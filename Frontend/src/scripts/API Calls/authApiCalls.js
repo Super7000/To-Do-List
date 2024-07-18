@@ -26,7 +26,7 @@ const login = async (email, password, successfullFuncCallBack = () => { }) => {
 };
 
 // Function to handle registration
-const register = async (username, email, password) => {
+const register = async (username, email, password, onSuccess = () => { }) => {
     try {
         const response = await fetch(`${apiUrl}/api/auth/register`, {
             method: 'POST',
@@ -39,6 +39,7 @@ const register = async (username, email, password) => {
         const data = await response.json();
         if (response.ok) {
             alert('Registration successful');
+            onSuccess()
         } else {
             alert(data.message);
         }
