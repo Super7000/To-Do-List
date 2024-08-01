@@ -1,59 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { addCategory, getCategories, updateCategory } from '../scripts/API Calls/categoryApiCalls';
 
-function Categorys({ activeCategory, setActiveCategory, logOutFunction = () => { }, searchValue = '' }) {
-    const [categorys, setCategorys] = useState([])
-    const [filtedCategorys, setFiltedCategorys] = useState([]) // used to search categories
-
-    async function downloadCategories() {
-        getCategories(logOutFunction).then((data) => {
-            setCategorys(data)
-        })
-    }
-
-    useEffect(() => {
-        downloadCategories()
-    }, [activeCategory])
-
-    useEffect(() => {
-        getCategories(logOutFunction).then((data) => {
-            if (data.length <= 0) return;
-            else setActiveCategory(data[0])
-        })
-    }, [])
-
-    useEffect(() => {
-        if (searchValue.trim() === '') setFiltedCategorys(categorys)
-        else setFiltedCategorys(categorys.filter(category => category.name.trim().toLowerCase().includes(searchValue.trim().toLowerCase())))
-    }, [searchValue, categorys])
-
+function Categorys({ categorysData, onActiveCategoryChange = () => { }, onCategoryRename = () => { }, onAddBtnClick = () => { }, activeCategory }) {
     return (
         <div className='mt-4 flex-grow-1'>
             <h5 className='fw-bold'>Categorys</h5>
             <div className='d-flex flex-column scroll' style={{ gap: '0.3rem' }} >
 
                 {
-                    filtedCategorys.length <= 0 ?
+                    categorysData.length <= 0 ?
                         <div className='m-auto'>No Categories</div> :
-                        filtedCategorys.map((category) => {
-                            return <CategoryCard
+                        categorysData.map(category =>
+                            <CategoryCard
                                 name={category.name}
                                 key={category.category_id}
                                 id={category.category_id}
                                 active={category.category_id === activeCategory.category_id}
-                                setActiveCategory={setActiveCategory}
-                                onClickHandler={() => {
-                                    setActiveCategory(category)
+                                onRename={async newName => {
+                                    onCategoryRename({ ...category, name: newName })
+                                }}
+                                onClick={() => {
+                                    onActiveCategoryChange(category)
                                 }} />
-                        })
+                        )
                 }
 
                 {/* Add Category Button */}
-                <div className='card cursor-pointer' onClick={async () => {
-                    addCategory("Category").then(() => {
-                        downloadCategories()
-                    })
-                }}>
+                <div className='card cursor-pointer' onClick={onAddBtnClick}>
                     <div className='card-body p-1'>
                         <div className={'text text-center fs-5'}>{'+'}</div>
                     </div>
@@ -63,38 +36,33 @@ function Categorys({ activeCategory, setActiveCategory, logOutFunction = () => {
     )
 }
 
-function CategoryCard({ name = "Category", id, active = false, onClickHandler = () => { }, setActiveCategory = () => { } }) {
+function CategoryCard({ name = "Category", active = false, onClick = () => { }, onRename = () => { } }) {
     const [readOnly, setReadOnly] = useState(true)
     const [categoryName, setCategoryName] = useState(name)
 
     const inputBox = useRef()
 
-    async function onBlurHandler(e) {
-        updateCategory(id, categoryName)
-            .then(data => {
-                setReadOnly(true);
-                setActiveCategory(val => {
-                    return { ...val, name: categoryName }
-                })
-            })
+    async function onBlurHandler() {
+        setReadOnly(true);
+        onRename(categoryName)
     }
     return (
-        <div className={'card cursor-pointer' + (active ? " bg-primary" : " bg-deep-white")} onClick={onClickHandler}>
+        <div className={'card cursor-pointer' + (active ? " bg-primary" : " bg-deep-white")} onClick={onClick}>
             <div className='card-body p-2 input-group'>
                 <input
                     ref={inputBox}
                     value={categoryName}
                     readOnly={readOnly}
-                    className={'text border border-0 bg-transparant flex-grow-1 py-0 ms-1'
-                        + (readOnly ? ' cursor-pointer' : "") + (active ? " text-light" : "")}
+                    className={'text border bg-transparant flex-grow-1 py-0 ms-1'
+                        + (readOnly === true ? ' cursor-pointer border-0' : "border-2") + (active ? " text-light" : "")}
                     style={{ outline: 'none' }}
                     onBlur={onBlurHandler}
                     onChange={e => {
                         setCategoryName(e.target.value)
                     }}
-                    onDoubleClick={e => { 
-                        setReadOnly(false); 
-                        inputBox.current.focus() 
+                    onDoubleClick={() => {
+                        setReadOnly(false);
+                        inputBox.current.focus()
                     }}
                     onKeyDown={e => {
                         if (e.key === 'Enter' || e.keyCode === 13) {
@@ -102,7 +70,7 @@ function CategoryCard({ name = "Category", id, active = false, onClickHandler = 
                         }
                     }}
                 ></input>
-                <button className='btn py-0' onClick={e => {
+                <button className='btn py-0' onClick={() => {
                     setReadOnly(false);
                     inputBox.current.focus()
                 }}>
