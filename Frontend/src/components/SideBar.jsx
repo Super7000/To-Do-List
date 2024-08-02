@@ -40,13 +40,22 @@ function CategoriesWithSearch({ logOutFunction = () => { }, closeSideBar = () =>
             setCategorys(data)
         })
     }
-    useEffect(() => {
+
+    function startUpFunc() {
         getCategories(logOutFunction).then((data) => {
             setCategorys(data)
             if (data.length <= 0) return;
             else setActiveCategory(data[0])
         })
+    }
+
+    useEffect(() => {
+        startUpFunc()
     }, [])
+
+    useEffect(() => {
+        downloadCategories()
+    }, [activeCategory])
 
     return (
         <div className='flex-grow-1 scroll'>
@@ -75,7 +84,7 @@ function CategoriesWithSearch({ logOutFunction = () => { }, closeSideBar = () =>
                 }}
                 onAddBtnClick={async () => {
                     addCategory("Category").then(() => {
-                        downloadCategories()
+                        startUpFunc()
                     })
                 }}
                 activeCategory={activeCategory} />

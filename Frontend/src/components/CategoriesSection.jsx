@@ -1,14 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { addCategory, getCategories, updateCategory } from '../scripts/API Calls/categoryApiCalls';
+import React, { useRef, useState } from 'react';
 
-function Categorys({ categorysData, onActiveCategoryChange = () => { }, onCategoryRename = () => { }, onAddBtnClick = () => { }, activeCategory }) {
+function Categorys({ categorysData = [], onActiveCategoryChange = () => { }, onCategoryRename = () => { }, onAddBtnClick = () => { }, activeCategory }) {
     return (
         <div className='mt-4 flex-grow-1'>
             <h5 className='fw-bold'>Categorys</h5>
             <div className='d-flex flex-column scroll' style={{ gap: '0.3rem' }} >
 
                 {
-                    categorysData.length <= 0 ?
+                    (activeCategory === undefined || categorysData.length <= 0) ?
                         <div className='m-auto'>No Categories</div> :
                         categorysData.map(category =>
                             <CategoryCard

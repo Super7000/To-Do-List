@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import SideBar from './SideBar';
-import { addTask, getTasksByCategoryId } from '../scripts/API Calls/tasksApiCalls';
+import { addTask, deleteTask, getTasksByCategoryId, updateTask } from '../scripts/API Calls/tasksApiCalls';
 import { deleteCategory, getCategories } from '../scripts/API Calls/categoryApiCalls';
 import Task from './TaskCard';
 import DateTimePopUp from './DateTimePopUp';
@@ -29,7 +29,7 @@ function HomePage({ setIsLogIn }) {
                     activeCategory={activeCategory}
                     setActiveCategory={setActiveCategory} />}
 
-            {activeCategory.length <= 0 ?
+            {(activeCategory === undefined || activeCategory === null || activeCategory?.length <= 0) ?
                 <div className='m-auto'>Create a category first</div> :
                 <Tasks
                     logOutFunction={logOutFunction}
@@ -51,12 +51,23 @@ function Tasks({ logOutFunction = () => { }, activeCategory, setActiveCategory }
     const [tasks, setTasks] = useState([])
 
     const downloadAllTasks = async () => {
+        if (activeCategory === undefined || activeCategory === null) return
         const tasksArray = await getTasksByCategoryId(activeCategory.category_id, logOutFunction)
         if (await tasksArray) {
             setTasks(tasksArray)
         } else {
             setTasks([])
         }
+    }
+
+    function onTaskDetailsUpdateHandler(taskDetails) {
+        const { task_id, title, description, due_date, completed } = taskDetails
+        updateTask(task_id, title, description, due_date, completed, downloadAllTasks, false)
+    }
+
+    function deleteBtnClickHandler(taskDetails) {
+        const { task_id } = taskDetails;
+        deleteTask(task_id, downloadAllTasks);
     }
 
     useEffect(() => {
@@ -76,11 +87,13 @@ function Tasks({ logOutFunction = () => { }, activeCategory, setActiveCategory }
             {/* Category Details or header */}
             <div className='d-flex justify-content-between'>
                 <div>
-                    <div className='fw-bold fs-3' style={{ lineHeight: 1.2 }}>
-                        {activeCategory.name}
-                        <p className='text-muted m-0' style={{ fontSize: '0.8rem' }}>ID: {activeCategory.category_id}</p>
-                    </div>
-                    <div className='fs-6 text-secondary mt-1'>Created At: {activeCategory.created_at}</div>
+                    {activeCategory && <>
+                        <div className='fw-bold fs-3' style={{ lineHeight: 1.2 }}>
+                            {activeCategory.name}
+                            <p className='text-muted m-0' style={{ fontSize: '0.8rem' }}>ID: {activeCategory.category_id}</p>
+                        </div>
+                        <div className='fs-6 text-secondary mt-1'>Created At: {activeCategory.created_at}</div>
+                    </>}
                 </div>
                 <div className='d-flex align-items-center'>
                     <button className='btn px-3 py-2 pb-3 border-0 bg-mid-white' onClick={deleteCategoryBtnClickHandler}>
@@ -94,7 +107,12 @@ function Tasks({ logOutFunction = () => { }, activeCategory, setActiveCategory }
                 {
                     tasks.length <= 0 ?
                         <div className='m-auto'>No Task Added</div> :
-                        tasks.map(task => <Task key={task.task_id} {...task} downloadAllTasks={downloadAllTasks} />)
+                        tasks.map(task => <Task
+                            key={task.task_id}
+                            taskDetails={{ ...task }}
+                            onDelete={deleteBtnClickHandler}
+                            onTaskDetailsUpdate={onTaskDetailsUpdateHandler}
+                            downloadAllTasks={downloadAllTasks} />)
                 }
             </div>
 

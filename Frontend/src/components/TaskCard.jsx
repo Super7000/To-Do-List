@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import DateTimePopUp from './DateTimePopUp';
-import { updateTask, deleteTask } from '../scripts/API Calls/tasksApiCalls';
 
 function Task({
-    task_id = 1,
-    user_id = 1,
-    category_id = 1,
-    title = 'Task',
-    description = '',
-    due_date = '2024-07-12 21:44:03',
-    completed = false,
-    created_at = new Date(),
-    updated_at = '2024-06-27 00:00:00',
-    downloadAllTasks = () => { },
+    taskDetails = {
+        task_id: 1,
+        user_id: 1,
+        category_id: 1,
+        title: 'Task',
+        description: '',
+        due_date: '2024-07-12 21:44:03',
+        completed: false,
+        created_at: new Date(),
+        updated_at: '2024-06-27 00:00:00'
+    },
+    onDelete = async () => { },
+    onTaskDetailsUpdate = async () => { }
 }) {
-    const [titleState, setTitleState] = useState(title)
-    const [descriptionState, setDescriptionState] = useState(description)
-    const [completedState, setCompletedState] = useState(completed)
+    const [titleState, setTitleState] = useState(taskDetails.title)
+    const [descriptionState, setDescriptionState] = useState(taskDetails.description)
+    const [completedState, setCompletedState] = useState(taskDetails.completed)
 
     {/*Handlers for Title and Description Inputs*/ }
     function onChangeHandler(e) {
@@ -34,12 +36,13 @@ function Task({
 
     {/*calling the update api when user click outside of the task element*/ }
     function onBlurHandler(e) {
+        const { task_id, due_date, completed } = taskDetails
         switch (e.target.name) {
             case 'title':
-                updateTask(task_id, e.target.value, descriptionState, due_date, completed, downloadAllTasks, false)
+                onTaskDetailsUpdate({ task_id, title: e.target.value, description: descriptionState, due_date, completed })
                 break;
             case 'description':
-                updateTask(task_id, titleState, e.target.value, due_date, completed, downloadAllTasks, false)
+                onTaskDetailsUpdate({ task_id, title: titleState, description: e.target.value, due_date, completed })
                 break;
             default:
                 break;
@@ -47,21 +50,17 @@ function Task({
     }
 
     function completedBtnChangeHandler(e) {
+        const { task_id, due_date } = taskDetails
         setCompletedState(e.target.checked)
         if (e.target.checked)
-            updateTask(task_id, titleState, descriptionState, due_date, true, downloadAllTasks, false)
+            onTaskDetailsUpdate({ task_id, title: titleState, description: descriptionState, due_date, completed: true })
         else
-            updateTask(task_id, titleState, descriptionState, due_date, false, downloadAllTasks, false)
-    }
-
-    function deleteBtnClickHandler(e) {
-        e.preventDefault();
-        deleteTask(task_id, downloadAllTasks);
+            onTaskDetailsUpdate({ task_id, title: titleState, description: descriptionState, due_date, completed: false })
     }
     return (
         <>
             <form
-                className={'card bg-glass bg-mid-white' + (completed ? " border border-1 border-success bg-light-green" : " ")}
+                className={'card bg-glass bg-mid-white' + (taskDetails.completed ? " border border-1 border-success bg-light-green" : " ")}
                 onDoubleClick={e => {
                     e.currentTarget.style.cssText = 'border: 2px solid dodgerblue;'
                 }}>
@@ -79,7 +78,7 @@ function Task({
                         </div>
                         <input
                             className='text-dark fw-bold border-0 form-control bg-transparent me-3'
-                            style={{ textDecoration: (completed ? "line-through" : "none") }}
+                            style={{ textDecoration: (taskDetails.completed ? "line-through" : "none") }}
                             name='title'
                             placeholder='Task'
                             value={titleState}
@@ -91,24 +90,27 @@ function Task({
                                 }
                             }}
                         />
-                        <div className='text-secondary ms-auto d-flex flex-column align-items-center cursor-pointer' data-bs-toggle="modal" data-bs-target={"#popup" + task_id}>
-                            <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (completed ? "line-through" : "none") }} >
-                                {due_date.split(' ')[0]}
+                        <div className='text-secondary ms-auto d-flex flex-column align-items-center cursor-pointer' data-bs-toggle="modal" data-bs-target={"#popup" + taskDetails.task_id}>
+                            <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (taskDetails.completed ? "line-through" : "none") }} >
+                                {taskDetails.due_date.split(' ')[0]}
                             </p>
-                            <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (completed ? "line-through" : "none") }} >
-                                {due_date.split(' ')[1]}
+                            <p className='m-0 fw-bold' style={{ fontSize: '0.8rem', textDecoration: (taskDetails.completed ? "line-through" : "none") }} >
+                                {taskDetails.due_date.split(' ')[1]}
                             </p>
                         </div>
-                        <button className='btn ms-2' onClick={deleteBtnClickHandler}>
+                        <button className='btn ms-2' onClick={async e => {
+                            e.preventDefault()
+                            await onDelete(taskDetails)
+                        }}>
                             <img src='delete.svg' width={18} height={18}></img>
                         </button>
                         <div
                             className='btn btn-transparant dropdown-toggle border-0'
                             data-bs-toggle="collapse"
-                            data-bs-target={"#" + task_id}></div>
+                            data-bs-target={"#" + taskDetails.task_id}></div>
                     </div>
                     <textarea
-                        id={task_id}
+                        id={taskDetails.task_id}
                         name='description'
                         className="collapse form-control mt-1 bg-deep-white"
                         rows={3}
@@ -121,11 +123,12 @@ function Task({
             </form>
             <DateTimePopUp
                 heading='Edit Task'
-                id={'popup' + task_id}
-                defaultDueDate={due_date.split(' ')[0]}
-                defaultDueTime={due_date.split(' ')[1]}
+                id={'popup' + taskDetails.task_id}
+                defaultDueDate={taskDetails.due_date.split(' ')[0]}
+                defaultDueTime={taskDetails.due_date.split(' ')[1]}
                 saveBtnClickHandler={async (dueDate, dueTime) => {
-                    updateTask(task_id, titleState, descriptionState, dueDate + ' ' + dueTime, completed, downloadAllTasks)
+                    const { task_id } = taskDetails
+                    onTaskDetailsUpdate({ task_id, title: titleState, description: descriptionState, due_date: dueDate + ' ' + dueTime, completed: taskDetails.completed })
                 }}
             />
         </>
